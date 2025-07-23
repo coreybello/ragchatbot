@@ -1,0 +1,176 @@
+{
+  "summary": {
+    "total": 33,
+    "passed": 26,
+    "failed": 7,
+    "success_rate": 78.78787878787878,
+    "duration": 14.863826274871826
+  },
+  "details": {
+    "Database models import": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:20.647553"
+    },
+    "Configuration import": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:20.647569"
+    },
+    "Auth utils import": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:20.808374"
+    },
+    "FastAPI app import": {
+      "passed": false,
+      "details": "Vector store initialization failed: Collection [ragdemo_documents] does not exists",
+      "timestamp": "2025-07-22T21:31:32.479962"
+    },
+    "Directory backend/api": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.481221"
+    },
+    "Directory backend/core": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.482421"
+    },
+    "Directory backend/models": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.483716"
+    },
+    "Directory backend/utils": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.485036"
+    },
+    "Directory frontend/src": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.486271"
+    },
+    "Directory data": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.486463"
+    },
+    "Directory scripts": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.487148"
+    },
+    "File backend/api/main.py": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.488854"
+    },
+    "File backend/models/database.py": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.490643"
+    },
+    "File backend/core/config.py": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.492424"
+    },
+    "File frontend/package.json": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:32.493726"
+    },
+    "File requirements.txt": {
+      "passed": false,
+      "details": "Missing",
+      "timestamp": "2025-07-22T21:31:32.493916"
+    },
+    "Database functionality": {
+      "passed": false,
+      "details": "cannot import name 'User' from 'backend.models.database' (/mnt/c/Users/corey/LocalDocuments/RAG DEMO V2/backend/models/database.py)",
+      "timestamp": "2025-07-22T21:31:32.493975"
+    },
+    "Password hashing": {
+      "passed": true,
+      "details": "Hash generated",
+      "timestamp": "2025-07-22T21:31:32.681415"
+    },
+    "Password verification": {
+      "passed": true,
+      "details": "Valid: True",
+      "timestamp": "2025-07-22T21:31:32.854361"
+    },
+    "Invalid password rejection": {
+      "passed": true,
+      "details": "Rejected: True",
+      "timestamp": "2025-07-22T21:31:33.026679"
+    },
+    "JWT token creation": {
+      "passed": true,
+      "details": "Token generated",
+      "timestamp": "2025-07-22T21:31:33.026965"
+    },
+    "Vector store operations": {
+      "passed": false,
+      "details": "Vector store initialization failed: Collection [ragdemo_documents] does not exists",
+      "timestamp": "2025-07-22T21:31:34.908217"
+    },
+    "PDF processor initialization": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:35.009300"
+    },
+    "PDF processor ready": {
+      "passed": true,
+      "details": "Initialization successful",
+      "timestamp": "2025-07-22T21:31:35.009320"
+    },
+    "LLM model file": {
+      "passed": false,
+      "details": "Model not found: ./models/mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+      "timestamp": "2025-07-22T21:31:35.010202"
+    },
+    "LLM client test": {
+      "passed": true,
+      "details": "Skipped - no model file",
+      "timestamp": "2025-07-22T21:31:35.010217"
+    },
+    "Server running": {
+      "passed": false,
+      "details": "Server not responding",
+      "timestamp": "2025-07-22T21:31:35.011088"
+    },
+    "API endpoint tests": {
+      "passed": false,
+      "details": "Server required for API tests",
+      "timestamp": "2025-07-22T21:31:35.011097"
+    },
+    "NPM available": {
+      "passed": true,
+      "details": "Version: 11.4.2",
+      "timestamp": "2025-07-22T21:31:35.073047"
+    },
+    "Dependencies installed": {
+      "passed": true,
+      "details": "",
+      "timestamp": "2025-07-22T21:31:35.074659"
+    },
+    "Frontend structure": {
+      "passed": true,
+      "details": "React app structure validated",
+      "timestamp": "2025-07-22T21:31:35.074690"
+    },
+    "Memory usage check": {
+      "passed": true,
+      "details": "RSS: 1076.8 MB",
+      "timestamp": "2025-07-22T21:31:35.075088"
+    },
+    "Concurrent operations": {
+      "passed": true,
+      "details": "Completed 10/10",
+      "timestamp": "2025-07-22T21:31:35.287046"
+    }
+  }
+}

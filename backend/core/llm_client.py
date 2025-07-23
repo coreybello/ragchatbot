@@ -1,14 +1,22 @@
 """
 LLM client for Mistral 7B with streaming support
-Uses llama-cpp-python for CPU-optimized inference
+Uses llama-cpp-python for CPU-optimized inference with fallback support
 """
 import asyncio
 from typing import AsyncGenerator, Optional
 import logging
-from llama_cpp import Llama
+import os
 
 from backend.core.config import get_settings
 from backend.models.database import get_config_value, SessionLocal
+
+# Try to import llama-cpp-python, fallback to mock if not available
+try:
+    from llama_cpp import Llama
+    LLAMA_CPP_AVAILABLE = True
+except ImportError:
+    LLAMA_CPP_AVAILABLE = False
+    logging.warning("llama-cpp-python not available, using fallback responses")
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +29,17 @@ class LLMClient:
         self._load_model()
     
     def _load_model(self):
-        """Load the Mistral model with CPU optimization"""
+        """Load the Mistral model with CPU optimization or use fallback"""
+        if not LLAMA_CPP_AVAILABLE:
+            logger.warning("🔄 Using fallback LLM - llama-cpp-python not installed")
+            self.model = None
+            return
+            
+        if not os.path.exists(self.settings.model_path):
+            logger.warning(f"🔄 Model file not found at {self.settings.model_path}, using fallback")
+            self.model = None
+            return
+            
         try:
             logger.info(f"Loading model from: {self.settings.model_path}")
             
@@ -36,8 +54,8 @@ class LLMClient:
             logger.info("✅ Mistral model loaded successfully")
             
         except Exception as e:
-            logger.error(f"❌ Failed to load model: {e}")
-            raise RuntimeError(f"Could not load LLM model: {e}")
+            logger.error(f"❌ Failed to load model: {e}, using fallback")
+            self.model = None
     
     def _build_prompt(self, query: str, context: str) -> str:
         """Build the complete prompt with system instructions and context"""
@@ -68,7 +86,12 @@ Your Response: [/INST]"""
         """Generate streaming response from the LLM"""
         
         if not self.model:
-            raise RuntimeError("Model not loaded")
+            # Fallback response when model is not available
+            fallback_response = self._generate_fallback_response(query, context)
+            for char in fallback_response:
+                yield char
+                await asyncio.sleep(0.05)  # Simulate streaming
+            return
         
         # Get current model parameters
         db = SessionLocal()
@@ -109,7 +132,7 @@ Your Response: [/INST]"""
         """Generate complete response (non-streaming)"""
         
         if not self.model:
-            raise RuntimeError("Model not loaded")
+            return self._generate_fallback_response(query, context)
         
         db = SessionLocal()
         try:
@@ -139,6 +162,30 @@ Your Response: [/INST]"""
             return result['choices'][0]['text'].strip()
         
         return "I apologize, but I couldn't generate a response. Please try again."
+    
+    def _generate_fallback_response(self, query: str, context: str) -> str:
+        """Generate a fallback response when the LLM is not available"""
+        if context.strip():
+            return f"""Based on the provided documentation, I can help answer your question about: "{query}"
+
+The relevant information from the documentation shows:
+
+{context[:500]}...
+
+[Note: This is a fallback response. The full LLM model is not currently loaded. To get more detailed responses, please ensure the Mistral model is downloaded and available at the configured path.]
+
+For immediate assistance, please refer to the source documentation or contact your IT support team."""
+        else:
+            return f"""I understand you're asking about: "{query}"
+
+However, I don't have access to relevant documentation at the moment, and the full LLM model is not currently loaded.
+
+[Note: This is a fallback response. To get detailed answers, please ensure:
+1. Relevant documents are uploaded to the system
+2. The Mistral model is downloaded and available
+3. The vector database contains the necessary information]
+
+For immediate assistance, please contact your IT support team."""
     
     def update_parameters(self, temperature: float, top_p: float):
         """Update model generation parameters"""

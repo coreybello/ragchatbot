@@ -40,13 +40,23 @@ class VectorStore:
             try:
                 self.collection = self.client.get_collection("ragdemo_documents")
                 logger.info("✅ Connected to existing ChromaDB collection")
-            except ValueError:
+            except (ValueError, Exception):
                 # Collection doesn't exist, create it
-                self.collection = self.client.create_collection(
-                    name="ragdemo_documents",
-                    metadata={"hnsw:space": "cosine"}
-                )
-                logger.info("✅ Created new ChromaDB collection")
+                try:
+                    self.collection = self.client.create_collection(
+                        name="ragdemo_documents",
+                        metadata={"hnsw:space": "cosine"}
+                    )
+                    logger.info("✅ Created new ChromaDB collection")
+                except Exception as create_error:
+                    logger.warning(f"Failed to create collection: {create_error}")
+                    # Try to get existing collection one more time
+                    try:
+                        self.collection = self.client.get_collection("ragdemo_documents")
+                        logger.info("✅ Connected to existing ChromaDB collection on retry")
+                    except:
+                        logger.error("Failed to get or create ChromaDB collection")
+                        raise
                 
         except Exception as e:
             logger.error(f"❌ Failed to initialize vector store: {e}")

@@ -2,9 +2,9 @@
 Database models and initialization for RAG Demo
 Using SQLAlchemy with SQLite for simplicity
 """
-from sqlalchemy import create_engine, Column, Integer, String, Text, Boolean, DateTime, Float
+from sqlalchemy import create_engine, Column, Integer, String, Text, Boolean, DateTime, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 import json
 import os
@@ -26,6 +26,38 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Create base class for models
 Base = declarative_base()
 
+class User(Base):
+    """User authentication and profile table"""
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(100), unique=True, nullable=False, index=True)
+    hashed_password = Column(String(255), nullable=False)
+    is_admin = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_login = Column(DateTime)
+    
+    # Relationship with chat messages
+    chat_messages = relationship("ChatMessage", back_populates="user")
+
+class ChatMessage(Base):
+    """Chat message history table"""
+    __tablename__ = "chat_messages"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    message = Column(Text, nullable=False)
+    response = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    response_time = Column(Float)  # Response time in seconds
+    rating = Column(String(10))  # 'good', 'bad', or NULL
+    sources_used = Column(Text)  # JSON string of sources
+    
+    # Relationship with user
+    user = relationship("User", back_populates="chat_messages")
+
 class Query(Base):
     """Query history and metrics table"""
     __tablename__ = "queries"
@@ -46,11 +78,13 @@ class Document(Base):
     __tablename__ = "documents"
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    size_bytes = Column(Integer, nullable=False)
-    upload_date = Column(String, nullable=False)
+    filename = Column(String, nullable=False)  # Changed from 'name' to 'filename'
+    file_path = Column(String, nullable=False)  # Added file_path
+    file_size = Column(Integer, nullable=False)  # Changed from 'size_bytes'
+    upload_date = Column(DateTime, default=datetime.utcnow)  # Changed to DateTime
     chunks_count = Column(Integer, nullable=False)
-    images_count = Column(Integer, nullable=False)
+    images_count = Column(Integer, default=0)  # Added default
+    processed = Column(Boolean, default=False)  # Added processed status
     is_active = Column(Boolean, default=True)
 
 class Config(Base):
@@ -92,6 +126,19 @@ def init_db():
             ("temperature", "0.7"),
             ("top_p", "1.0")
         ]
+        
+        # Create default admin user if not exists
+        from backend.utils.auth import get_password_hash
+        admin_user = session.query(User).filter(User.username == "admin").first()
+        if not admin_user:
+            admin_user = User(
+                username="admin",
+                email="admin@example.com",
+                hashed_password=get_password_hash("admin123"),
+                is_admin=True,
+                is_active=True
+            )
+            session.add(admin_user)
         
         for key, value in default_configs:
             existing = session.query(Config).filter(Config.key == key).first()
