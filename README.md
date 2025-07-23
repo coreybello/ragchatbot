@@ -206,7 +206,3 @@ This project was built using the Claude Flow framework with 20 specialized AI ag
 - **16 Specialized Agents**: FastAPI, Database, Vector DB, LLM Integration, PDF Processing, Auth & Security, Streaming, RAG Pipeline, Deployment, Testing, DevOps, Performance Optimization, Configuration, Metrics & Analytics, Static Files, and more
 
 Each agent contributed specialized knowledge to create a comprehensive, production-ready RAG system.
-
-## 📜 License
-
-MIT License - Built with Claude Flow AI Agent Swarm Technology
